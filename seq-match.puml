@@ -1,0 +1,8 @@
+@startuml
+
+actor caller
+boundary Matcher
+caller -> Matcher : match(Attrs)
+Matcher -> caller: Contents
+
+@enduml

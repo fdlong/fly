@@ -1,0 +1,37 @@
+@startuml
+
+boundary Starter
+control Loader
+entity Fetcher
+entity IndexBuilder
+entity IndexSynchronizer
+
+[-> Starter : onStartup()
+activate Starter
+
+Starter -> Loader : load()
+activate Loader
+
+Loader -> Fetcher : featch()
+activate Fetcher
+
+Fetcher -> Loader
+deactivate Fetcher
+
+Loader -> IndexBuilder : build(Content)
+activate IndexBuilder
+
+IndexBuilder -> IndexBuilder : parse()
+IndexBuilder -> IndexBuilder : buildIndex()
+IndexBuilder -> IndexBuilder : buildRevIndex()
+IndexBuilder -> Loader
+deactivate IndexBuilder
+
+Loader --\ IndexSynchronizer : sync
+Loader -> Starter
+deactivate Loader
+
+[<- Starter
+deactivate Starter
+
+@enduml

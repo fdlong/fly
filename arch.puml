@@ -1,0 +1,17 @@
+@startuml
+
+interface Fetcher
+class ContentFetcher
+class IndexFetcher
+
+interface Loader
+class ContentLoader
+class IndexLoader
+
+Fetcher <|-- ContentFetcher
+Fetcher <|-- IndexFetcher
+
+Loader <|-- ContentLoader
+Loader <|-- IndexLoader
+
+@enduml

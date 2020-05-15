@@ -1,0 +1,23 @@
+@startuml
+
+cloud Leader #technology
+cloud Follower as Follower1
+cloud Follower as Follower2
+database cache as cacache0 #technology
+database cache as cacache1
+database cache as cacache2
+
+cacache0 -- Leader
+Follower1 .. cacache1
+Follower2 .. cacache2
+
+Leader <--- Follower1 : 1) reg
+Leader <--- Follower2 : 1) reg
+
+Leader <-- Follower1 : 2) ping
+Leader <-- Follower2 : 2) ping
+
+Leader <--- Follower1 : 3) pull
+Leader <--- Follower2 : 3) pull
+
+@enduml
