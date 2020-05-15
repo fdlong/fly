@@ -1,19 +1,19 @@
 # [XXX]
-一个高性能的内容定向检索引擎，用来向一个请求推送满足预先定义的定向条件的内容。
+一个高性能的内容定向检索引擎，用来向一个请求推送满足预先定义的定向条件的内容
 
-特点
-0. 高性能 毫秒级响应，单机QPS 万级
-0. 高可用 主从架构，选举机制
-0. 可扩展 支持内容加载器定制，支持内容缓存扩展
-0. 开箱即用 可独立部署，也可作为检索模块迁入应用
-0. 功能丰富 支持推送可定制，快速匹配（一旦命中即返回），定向自动过期
+特点  
++ 高性能 毫秒级响应，单机QPS 万级
++ 高可用 主从架构，选举机制
++ 可扩展 支持内容加载器定制，支持内容缓存扩展
++ 开箱即用 可独立部署，也可作为检索模块迁入应用
++ 功能丰富 支持推送可定制，快速匹配（一旦命中即返回），定向自动过期
 
 ## 架构
 
 
 
 ## 布尔表达式检索
-定向条件都类似于：20~25岁+女性，20~30岁+女性+北京，
+定向条件都类似于：20-25岁+女性，20-30岁+女性+北京，
 
 这里的定向条件用布尔表达式进行表示
 ```
@@ -52,40 +52,40 @@ age∈（23）∩ gender ∈ (女) ∩ city ∈ (上海)
 
 ## 设计思想
 [xxx]由以下几个组件组成
-0. Starter 启动器，负责引擎的启动
-0. Loader 文档加载器
-0. Fetcher 文档抽取器
-0. IndexBuilder 索引创建器
-0. IndexSynchronizer 索引同步器
-0. Matcher 检索器
++ Starter 启动器，负责引擎的启动
++ Loader 文档加载器
++ Fetcher 文档抽取器
++ IndexBuilder 索引创建器
++ IndexSynchronizer 索引同步器
++ Matcher 检索器
 
 在实际实现中，采用正反双层索引结构设计
 
 两层正排索引，用以维护定向条件的更新
-0. content-conjunction
-0. conjunction-assignment
++ content-conjunction
++ conjunction-assignment
 
 两层倒排索引，用来做内容检索
-0. conjunction-content
-0. assignment-conjunction
++ conjunction-content
++ assignment-conjunction
 
 ### 启动过程
 
 ### 定向条件维护
-当内容的定向条件发生改变时
-0. 根据content-conjunction找到该内容的原始定向conjunctions
-0. 从原始conjunctions的conjunction-content中将该内容移除
-0. 若某conjunction已无内容，可以将该conjunction从此索引中删除
-    0. 根据conjunction-assignment找到该conjunction的原始定向assignments
-    0. 从原始assignments的assignment-conjunction中将该内容移除
-    0. 若某assignment已无conjunction，可以将该assignment从此索引中删除
+当内容的定向条件发生改变时  
++ 根据content-conjunction找到该内容的原始定向conjunctions
++ 从原始conjunctions的conjunction-content中将该内容移除
++ 若某conjunction已无内容，可以将该conjunction从此索引中删除
+    ++ 根据conjunction-assignment找到该conjunction的原始定向assignments
+    ++ 从原始assignments的assignment-conjunction中将该内容移除
+    ++ 若某assignment已无conjunction，可以将该assignment从此索引中删除
 
 ### 内容检索过程
-实际检索过程中，通过assignment筛选出满足条件的conjunction，再根据conjunction找出满足条件的内容集合
-0. 当请求的特征 sizeof(attrs) < sizeof(conjunction)，该conjunction一定不满足要求，可以先利用这个判断减少计算
-0. 计算特征满足的assignments
-0. 查找assignment-conjunction获取conjunctions，当conjunction被命中的次数 hit(conjunction) >= sizeof(conjunction)时，该conjunction定向条件被满足
-0. 查找conjunction-content，获取推送内容
+实际检索过程中，通过assignment筛选出满足条件的conjunction，再根据conjunction找出满足条件的内容集合  
++ 当请求的特征 sizeof(attrs) < sizeof(conjunction)，该conjunction一定不满足要求，可以先利用这个判断减少计算
++ 计算特征满足的assignments
++ 查找assignment-conjunction获取conjunctions，当conjunction被命中的次数 hit(conjunction) >= sizeof(conjunction)时，该conjunction定向条件被满足
++ 查找conjunction-content，获取推送内容
 
 
 ## 接口规范
