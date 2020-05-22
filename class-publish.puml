@@ -1,0 +1,158 @@
+@startuml
+set namespaceSeparator ::
+namespace clarkii {
+	namespace core {
+		namespace bean <<交互数据包>> {
+			class Attrs {
+				- Attr[] attrs
+				+ Attr[] getAttrs()
+				+ Attr getAttr(String name)
+			}
+			class Attr {
+				- String name
+				- Object value
+				+ String getName()
+				+ Object getValue()
+			}
+			Attrs +-- Attr
+
+			class Contents {
+				- Content[] contents
+				+ Content[] getContents()
+				+ Content getContent(String id)
+			}
+			class Content {
+				- String id
+				- Serializable value
+				- Condition condition
+				- Timestamp startTime
+				- Timestamp endTime
+				+ String getId()
+				+ Serializable getValue()
+				+ Condition getCondition()
+				+ Timestamp getStartTime()
+				+ Timestamp getEndTime()
+			}
+			Contents +-- Content
+
+			class Condition <K, V> {
+				~ K left
+				~ Operator operator
+				~ V... right
+				+ {static} Condition of()
+				+ {static} Condition of(String attr, Operator operator, <Comparable>... values)
+				+ {static} Condition parse(String text)
+				+ Condition or(Condition other)
+				+ Condition or(String attr, Operator operator, <Comparable>... values)
+				+ Condition and(Condition other)
+				+ Condition and(String attr, Operator operator, <Comparable>... values)
+				+ Condition negate()
+				+ Condition of(String attr, Operator operator, <Comparable>... values)
+				+ String toJson()
+			}
+			class NoCondition extends Condition {
+			}
+			class LeafCondition extends Condition {
+				+ String getAttr()
+				+ Operator getOperator()
+				+ Comparable[] getValue()
+			}
+
+			enum Operator {
+				eq
+				ne
+				gt
+				gte
+				lt
+				lte
+				in
+				bt
+				or
+				and
+				not
+			}
+		}
+
+		namespace engine <<检索引擎>> {
+			class Publisher {
+				+ void publish(Content content)
+				+ void publish(Contents contents)
+			}
+		}
+
+		namespace parser <<DNF解释器>> {
+			class DNFParser {
+				Conjunction[] parse(Condition condition)
+			}
+		}
+
+		namespace dnf <<DNF对象结构>> {
+			class Content {
+				- String id
+				- Conjunction[] conjunctions
+				+ String getId()
+				+ Conjunction[] getConjunctions()
+			}
+			class Conjunction {
+				- Assignment[] assignments
+				+ Assignment[] getAssignments()
+				+ int size()
+			}
+			class Assignment {
+				- String attribute
+				- Comparator comparator;
+				- Comparable value
+				+ String getAttribute()
+				+ Comparator getComparator()
+				+ Comparable getValue()
+			}
+			enum Comparator {
+				EQ
+				GT
+				LT
+			}
+		}
+
+		namespace cache {
+			class CacheResolver {
+				+ void resolve(Content content)
+			}
+			interface IndexBuilder {
+				void build(Conjunction condition)
+			}
+			class PointIndexBuilder implements IndexBuilder
+			class RangeIndexBuilder implements IndexBuilder
+			class CacheKeeper {
+				缓存维护器:
+				缓存的统一操作入口
+			}
+		}
+
+		package doc <<缓存对象结构>> {
+			class Doc {
+				String id
+				Serializable value
+				Condition condition
+				Timestamp startTime
+				Timestamp endTime
+			}
+			class DocConj {
+				- String docId
+				- String[] conjCode
+			}
+			class ConjAsgn {
+				- String conjCode
+				- String[] asgnCode
+			}
+			class ConjDoc {
+				- String conjCode
+				- String[] docCode
+			}
+			class AsgnConj {
+				- String asgnCode
+				- String[] conjCode
+			}
+		}
+	}
+}
+@enduml

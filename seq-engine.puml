@@ -1,35 +1,57 @@
 @startuml
 
 boundary Starter
-control Loader
-entity Fetcher
-entity IndexBuilder
-entity IndexSynchronizer
+control Engine
+control CacheLoader #EEE
+control CacheSynchronizer #AAA
+control CacheKeeper
+entity Cache
 
 [-> Starter : onStartup()
 activate Starter
 
-Starter -> Loader : load()
-activate Loader
+Starter -> Engine : start()
+activate Engine
 
-Loader -> Fetcher : featch()
-activate Fetcher
+Engine -> Engine : init()
 
-Fetcher -> Loader
-deactivate Fetcher
+Engine -> Engine : load()
+activate Engine
 
-Loader -> IndexBuilder : build(Content)
-activate IndexBuilder
+Engine -> CacheLoader : load()
+activate CacheLoader
 
-IndexBuilder -> IndexBuilder : parse()
-IndexBuilder -> IndexBuilder : buildIndex()
-IndexBuilder -> IndexBuilder : buildRevIndex()
-IndexBuilder -> Loader
-deactivate IndexBuilder
+CacheLoader -> CacheKeeper :
+activate CacheKeeper
 
-Loader --\ IndexSynchronizer : sync
-Loader -> Starter
-deactivate Loader
+deactivate Engine
+
+
+CacheKeeper -> Cache : CMD()
+deactivate CacheKeeper
+
+deactivate CacheSynchronizer
+
+deactivate CacheLoader
+
+Engine -> Engine : join() 加入集群
+
+Engine -> CacheSynchronizer : start()
+activate CacheSynchronizer
+CacheSynchronizer -> Engine
+deactivate CacheSynchronizer
+
+CacheSynchronizer -> CacheSynchronizer : run()
+activate CacheSynchronizer
+CacheSynchronizer -> CacheKeeper :
+activate CacheKeeper
+CacheKeeper -> Cache : CMD()
+deactivate CacheKeeper
+
+deactivate CacheSynchronizer
+
+Engine -> Starter
+deactivate Engine
 
 [<- Starter
 deactivate Starter

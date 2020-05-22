@@ -1,0 +1,83 @@
+@startuml
+set namespaceSeparator ::
+namespace clarkii {
+	namespace core {
+		namespace bean <<交互数据包>> {
+			class Attrs {
+				- Attr[] attrs
+				+ Attr[] getAttrs()
+				+ Attr getAttr(String name)
+			}
+			class Attr {
+				- String name
+				- Object value
+				+ String getName()
+				+ Object getValue()
+			}
+			Attrs +-- Attr
+
+			class Contents {
+				- Content[] contents
+				+ Content[] getContents()
+				+ Content getContent(String id)
+			}
+			class Content {
+				- String id
+				- Serializable value
+				- Condition condition
+				- Timestamp startTime
+				- Timestamp endTime
+				+ String getId()
+				+ Serializable getValue()
+				+ Condition getCondition()
+				+ Timestamp getStartTime()
+				+ Timestamp getEndTime()
+			}
+			Contents +-- Content
+
+			class Condition <K, V> {
+				~ K left
+				~ Operator operator
+				~ V... right
+				+ {static} Condition of()
+				+ {static} Condition of(String attr, Operator operator, <Comparable>... values)
+				+ {static} Condition parse(String text)
+				+ Condition or(Condition other)
+				+ Condition or(String attr, Operator operator, <Comparable>... values)
+				+ Condition and(Condition other)
+				+ Condition and(String attr, Operator operator, <Comparable>... values)
+				+ Condition negate()
+				+ Condition of(String attr, Operator operator, <Comparable>... values)
+				+ String toJson()
+			}
+			class NoCondition extends Condition {
+			}
+			class LeafCondition extends Condition {
+				+ String getAttr()
+				+ Operator getOperator()
+				+ Comparable[] getValue()
+			}
+
+			enum Operator {
+				eq
+				ne
+				gt
+				gte
+				lt
+				lte
+				in
+				bt
+				or
+				and
+				not
+			}
+		}
+
+		namespace engine <<检索引擎>> {
+			class Matcher {
+				+ Contents match(Attrs attrs)
+			}
+		}
+	}
+}
+@enduml

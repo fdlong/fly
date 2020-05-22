@@ -1,0 +1,136 @@
+@startuml
+set namespaceSeparator ::
+
+package clarkii {
+
+	package application <<WEB UI>> #EEE {
+		class Starter {
+
+		}
+	}
+
+	package core {
+		package engine <<检索引擎>> {
+			class Engine {
+				+ void start()
+				- void init()
+				- void load()
+			}
+		}
+
+		package cache  {
+			interface CacheSynchronizer {
+				缓存同步器：
+				从Leader获取最近更新
+				同步至本Follower的缓存
+				void sync()
+			}
+			class MemoryCacheSynchronizer implements CacheSynchronizer, Runnable
+
+			interface CacheLoader #EEE {
+				缓存加载器：
+				从本地持久化加载至缓存
+				void load()
+			}
+			class MemoryCacheLoader #EEE implements CacheLoader
+			class RedisCacheLoader #888 implements CacheLoader
+			interface CachePersistor #EEE {
+				缓存持久器：
+				将本机的缓存进行持久化
+				void persist()
+			}
+			class FileCachePersistor #EEE implements CachePersistor, Runnable
+			class CacheKeeper {
+				缓存维护人:
+				缓存的统一操作入口
+			}
+		}
+
+		package dnf <<DNF对象结构>> {
+			class Content {
+				- String id
+				- Conjunction[] conjunctions
+				+ String getId()
+				+ Conjunction[] getConjunctions()
+			}
+			class Conjunction {
+				- Assignment[] assignments
+				+ Assignment[] getAssignments()
+				+ int size()
+			}
+			class Assignment {
+				- String attribute
+				- Comparator comparator;
+				- Comparable value
+				+ String getAttribute()
+				+ Comparator getComparator()
+				+ Comparable getValue()
+			}
+			enum Comparator {
+				EQ
+				GT
+				LT
+			}
+		}
+
+		package doc <<缓存对象结构>> {
+			class Doc {
+				- String id
+				- Serializable value
+				- Condition condition
+				- Timestamp startTime
+				- Timestamp endTime
+				+ String getId()
+				+ Serializable getValue()
+				+ Condition getCondition()
+				+ Timestamp getStartTime()
+				+ Timestamp getEndTime()
+			}
+			class DocConj {
+				- String docId
+				- String[] conjCode
+			}
+			class ConjAsgn {
+				- String conjCode
+				- String[] asgnCode
+			}
+			class ConjDoc {
+				- String conjCode
+				- String[] docCode
+			}
+			class AsgnConj {
+				- String asgnCode
+				- String[] conjCode
+			}
+		}
+
+		package file #888 {
+			class log #888 {
+			}
+			class doc.cdp {
+				String id
+				String value
+				Timestamp startTime
+                Timestamp endTime
+				String condition
+			}
+			class doc_conj.cdp {
+				String doc_id
+				String[] conj_code
+			}
+			class conj_asgn.cdp {
+				String conj_code
+				String[] asgn_code
+			}
+			class conj_doc.cdp {
+				String conj_code
+				String[] doc_id
+			}
+			class asgn_conj.cdp {
+				String asgn_code
+				String[] conj_code
+			}
+		}
+	}
+}
+@enduml

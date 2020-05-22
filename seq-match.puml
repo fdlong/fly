@@ -1,8 +1,39 @@
 @startuml
 
-actor caller
-boundary Matcher
-caller -> Matcher : match(Attrs)
-Matcher -> caller: Contents
+
+boundary Starter
+boundary Engine
+control CacheLoader
+control CacheSynchronizer
+control ComparisonResolver
+entity Cache
+
+[-> Starter : onStartup()
+activate Starter
+
+Starter -> Loader : load()
+activate Loader
+
+Loader -> Fetcher : featch()
+activate Fetcher
+
+Fetcher -> Loader
+deactivate Fetcher
+
+Loader -> IndexBuilder : build(Content)
+activate IndexBuilder
+
+IndexBuilder -> IndexBuilder : parse()
+IndexBuilder -> IndexBuilder : buildIndex()
+IndexBuilder -> IndexBuilder : buildRevIndex()
+IndexBuilder -> Loader
+deactivate IndexBuilder
+
+Loader --\ IndexSynchronizer : sync
+Loader -> Starter
+deactivate Loader
+
+[<- Starter
+deactivate Starter
 
 @enduml

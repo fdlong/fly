@@ -1,0 +1,11 @@
+@startuml
+
+Boundary Publisher
+control DNFParser
+control DNFResolver
+control IndexBuilder
+control CacheKeeper
+control CachePersister
+
+
+@enduml
