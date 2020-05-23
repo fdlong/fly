@@ -3,52 +3,51 @@
 boundary Starter
 control Engine
 control CacheLoader #EEE
-control CacheSynchronizer #AAA
+control Synchronizer #AAA
+control CacheScavenger
 control CacheKeeper
-entity Cache
 
 [-> Starter : onStartup()
 activate Starter
 
 Starter -> Engine : start()
 activate Engine
-
 Engine -> Engine : init()
-
-Engine -> Engine : load()
-activate Engine
-
 Engine -> CacheLoader : load()
 activate CacheLoader
 
-CacheLoader -> CacheKeeper :
-activate CacheKeeper
-
-deactivate Engine
-
-
-CacheKeeper -> Cache : CMD()
-deactivate CacheKeeper
-
-deactivate CacheSynchronizer
+CacheLoader -> CacheKeeper
 
 deactivate CacheLoader
 
+Engine -> CacheScavenger : start()
+activate CacheScavenger
+CacheScavenger -> Engine
+deactivate CacheScavenger
+
+CacheScavenger -> CacheScavenger : run()
+activate CacheScavenger
+CacheScavenger -> CacheKeeper : keep(pack)
+deactivate CacheScavenger
+CacheScavenger -> CacheKeeper : keep(pack)
+activate CacheScavenger
+deactivate CacheScavenger
+
+Engine -> Engine : up()
+
 Engine -> Engine : join() 加入集群
 
-Engine -> CacheSynchronizer : start()
-activate CacheSynchronizer
-CacheSynchronizer -> Engine
-deactivate CacheSynchronizer
+Engine -> Synchronizer : start()
+activate Synchronizer
+Synchronizer -> Engine
+deactivate Synchronizer
 
-CacheSynchronizer -> CacheSynchronizer : run()
-activate CacheSynchronizer
-CacheSynchronizer -> CacheKeeper :
-activate CacheKeeper
-CacheKeeper -> Cache : CMD()
-deactivate CacheKeeper
-
-deactivate CacheSynchronizer
+Synchronizer -> Synchronizer : run()
+activate Synchronizer
+Synchronizer -> CacheKeeper : keep(pack)
+deactivate Synchronizer
+Synchronizer -> CacheKeeper : keep(pack)
+activate Synchronizer
 
 Engine -> Starter
 deactivate Engine
