@@ -54,11 +54,11 @@ age∈（23）∩ gender ∈ (女) ∩ city ∈ (上海)
 ## 设计思想
 [xxx]由以下几个组件组成
 + Starter 启动器，负责引擎的启动
-+ Loader 文档加载器
-+ Fetcher 文档抽取器
-+ IndexBuilder 索引创建器
++ Engine
++ CacheLoader 缓存加载器
 + IndexSynchronizer 索引同步器
 + Matcher 检索器
++ Publisher 内容发布器
 
 在实际实现中，采用正反双层索引结构设计
 
@@ -94,18 +94,4 @@ age∈（23）∩ gender ∈ (女) ∩ city ∈ (上海)
 ### Contents
 ### Attrs
 
-0. name 名称，缺省同field
-0. field 字段，需要匹配的字段
-0. type 类型，匹配字段的类型也即操作数的类型
-0. operator 操作符，需支持eq、in、bt、gt、ge、lt、le
-0. operand 操作数，
 
-```json
-{
-  "name" : "年龄",
-  "field" : "age",
-  "type" : "Integer",
-  "operator" : "bt",
-  "operand" : [20, 25]
-}
-```
