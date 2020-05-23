@@ -3,37 +3,41 @@ set namespaceSeparator ::
 
 package clarkii {
 
-	package application <<WEB UI>> #EEE {
+	namespace application <<WEB UI>> #EEE {
 		class Starter {
 
 		}
 	}
 
-	package core {
-		package engine <<检索引擎>> {
+	namespace core {
+		namespace engine <<检索引擎>> {
 			class Engine {
 				+ void start()
 				- void init()
-				- void load()
+				- void loadCache()
+				- void startScav()
+				- void join()
+				- void up()
 			}
+            class Synchronizer #EEE implements Runnable {
+                缓存同步器：
+                从Leader获取最近更新
+                同步至本Follower的缓存
+                void sync()
+            }
 		}
 
-		package cache  {
-			interface CacheSynchronizer {
-				缓存同步器：
-				从Leader获取最近更新
-				同步至本Follower的缓存
-				void sync()
-			}
-			class MemoryCacheSynchronizer implements CacheSynchronizer, Runnable
-
+		namespace cache  {
+			class CacheScavenger implements Runnable {
+                缓存清理器：
+                void scav()
+            }
 			interface CacheLoader #EEE {
 				缓存加载器：
 				从本地持久化加载至缓存
 				void load()
 			}
-			class MemoryCacheLoader #EEE implements CacheLoader
-			class RedisCacheLoader #888 implements CacheLoader
+			class FileCacheLoader #EEE implements CacheLoader
 			interface CachePersistor #EEE {
 				缓存持久器：
 				将本机的缓存进行持久化
@@ -41,12 +45,17 @@ package clarkii {
 			}
 			class FileCachePersistor #EEE implements CachePersistor, Runnable
 			class CacheKeeper {
-				缓存维护人:
+				缓存维护器:
 				缓存的统一操作入口
+				keep(Pack pack)
 			}
+
+			class MemoryCacheKeeper implements CacheKeeper
+			class RedisCacheKeeper #EEE implements CacheKeeper
+
 		}
 
-		package dnf <<DNF对象结构>> {
+		namespace dnf <<DNF对象结构>> {
 			class Content {
 				- String id
 				- Conjunction[] conjunctions
@@ -73,7 +82,14 @@ package clarkii {
 			}
 		}
 
-		package doc <<缓存对象结构>> {
+		namespace doc <<缓存对象结构>> {
+		    class Pack {
+		        - Doc[] docs
+		        - DocConj[] docConjs
+		        - ConjAsgn[] conjAsgns
+		        - ConjDoc[] conjDocs
+		        - AsgnConj[] asgnConjs
+		    }
 			class Doc {
 				- String id
 				- Serializable value
@@ -104,7 +120,7 @@ package clarkii {
 			}
 		}
 
-		package file #888 {
+		namespace file #888 {
 			class log #888 {
 			}
 			class doc.cdp {
